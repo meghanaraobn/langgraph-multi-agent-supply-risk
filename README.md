@@ -29,26 +29,26 @@ risk assessment. High-risk cases are routed to human review before a final repor
 ### Investigation flow
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '18px'}, 'flowchart': {'nodeSpacing': 55, 'rankSpacing': 85}}}%%
+%%{init: {'themeVariables': {'fontSize': '16px'}, 'flowchart': {'nodeSpacing': 70, 'rankSpacing': 95}}}%%
 flowchart TD
     Client[Client] -->|HTTP| UV[Uvicorn ASGI server]
     UV --> API["FastAPI routes<br/>(Pydantic request/response schemas)"]
     API -->|background task| SA
 
     subgraph LG["LangGraph StateGraph — InvestigationState (Postgres checkpointer)"]
-        SA[Supplier Agent] -->|found| SUP[Supervisor]
+        SA["<b>Supplier Agent</b><br/>looks up the supplier record from its ID"] -->|found| SUP
         SA -->|not found| END1([END])
-        SUP -->|"route_to_specialists() fan-out"| CA[Compliance Agent]
-        SUP --> RSK[Risk Agent]
-        SUP --> SUS[Sustainability Agent]
-        SUP --> RAG[RAG Agent]
-        CA --> RAN[Risk Analyst]
-        RSK --> RAN
-        SUS --> RAN
-        RAG --> RAN
-        RAN -->|normal risk| END2([END: Final Report])
-        RAN -->|high / critical risk| HR[Human Review]
-        HR -->|approve / reject| END2
+        SUP["<b>Supervisor</b><br/>decides which specialists this case needs"] -->|"route_to_specialists() fan-out"| CA
+        SUP --> RSK
+        SUP --> SUS
+        SUP --> RAG
+        CA["<b>Compliance Agent</b><br/>certification validity + sanctions-list hits"] --> RAN
+        RSK["<b>Risk Agent</b><br/>incident history: severity vs. resolved status"] --> RAN
+        SUS["<b>Sustainability Agent</b><br/>ESG/emissions data + which regulations apply"] --> RAN
+        RAG["<b>RAG Agent</b><br/>searches audit-report PDFs for supporting evidence"] --> RAN
+        RAN["<b>Risk Analyst</b><br/>merges all findings into one risk level + flags"] -->|normal risk| END2([END: Final Report])
+        RAN -->|high / critical risk| HR
+        HR["<b>Human Review</b><br/>a person approves, rejects, or asks for more info"] -->|approve / reject| END2
         HR -->|request more info| SUP
     end
 
