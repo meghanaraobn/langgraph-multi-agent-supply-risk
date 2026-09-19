@@ -26,13 +26,16 @@ Weaviate, using sentence-transformers embeddings, rather than querying structure
 Postgres/JSON records like the other three. Findings are merged by a Risk Analyst node into a
 risk assessment. High-risk cases are routed to human review before a final report is produced.
 
+### Investigation flow
+
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '18px'}, 'flowchart': {'nodeSpacing': 55, 'rankSpacing': 85}}}%%
 flowchart TD
     Client[Client] -->|HTTP| UV[Uvicorn ASGI server]
     UV --> API["FastAPI routes<br/>(Pydantic request/response schemas)"]
     API -->|background task| SA
 
-    subgraph LG["LangGraph StateGraph — InvestigationState<br/>(langgraph-checkpoint-postgres)"]
+    subgraph LG["LangGraph StateGraph — InvestigationState (Postgres checkpointer)"]
         SA[Supplier Agent] -->|found| SUP[Supervisor]
         SA -->|not found| END1([END])
         SUP -->|"route_to_specialists() fan-out"| CA[Compliance Agent]
@@ -49,28 +52,29 @@ flowchart TD
         HR -->|request more info| SUP
     end
 
-    CA -.->|certification + sanctions tools| PG[("Postgres<br/>via SQLAlchemy + psycopg")]
+    CA -.->|certification + sanctions tools| PG[("Postgres")]
     RSK -.->|incident + sanctions tools| PG
     SUS -.->|sustainability + regulation tools| PG
-    RAG -.->|search_documents| WV[("Weaviate<br/>hybrid BM25 + vector search")]
-    SUP -.->|"bind_tools() / structured output"| LLM["Azure OpenAI<br/>via LangChain ChatOpenAI"]
-    CA -.-> LLM
-    RSK -.-> LLM
-    SUS -.-> LLM
-    RAG -.-> LLM
-    RAN -.-> LLM
+    RAG -.->|search_documents| WV[("Weaviate")]
+    SUP -.->|"LLM calls — every agent node, via LangChain"| LLM["Azure OpenAI<br/>(ChatOpenAI)"]
     LG -.->|traces| LS[LangSmith]
-
-    subgraph INGEST["RAG ingestion (offline, one-time)"]
-        GEN["generate_synthetic_pdfs.py<br/>(reportlab)"] --> PDF[/Raw audit-report PDFs/]
-        PDF --> PARSE["pdfplumber<br/>layout/table-aware parsing"]
-        PARSE --> CHUNK["RecursiveCharacterTextSplitter<br/>(langchain-text-splitters)"]
-        CHUNK --> EMBED["sentence-transformers<br/>BAAI/bge-large-en-v1.5"]
-        EMBED --> WV
-    end
 ```
 
-Solid arrows are graph control flow; dashed arrows are data/model access. `pydantic-settings` + `python-dotenv` load config from `.env`; `pytest`, `ruff`, and `mypy` are the test/lint/type-check toolchain and aren't pictured above.
+Solid arrows are graph control flow; dashed arrows are data/model access.
+
+### RAG ingestion (offline, one-time)
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '18px'}, 'flowchart': {'nodeSpacing': 55, 'rankSpacing': 85}}}%%
+flowchart LR
+    GEN["generate_synthetic_pdfs.py<br/>(reportlab)"] --> PDF[/Raw audit-report PDFs/]
+    PDF --> PARSE["pdfplumber<br/>layout/table-aware parsing"]
+    PARSE --> CHUNK["RecursiveCharacterTextSplitter<br/>(langchain-text-splitters)"]
+    CHUNK --> EMBED["sentence-transformers<br/>BAAI/bge-large-en-v1.5"]
+    EMBED --> WV[("Weaviate")]
+```
+
+`pydantic-settings` + `python-dotenv` load config from `.env`; `pytest`, `ruff`, and `mypy` are the test/lint/type-check toolchain and aren't pictured above.
 
 See [docs/architecture.md](docs/architecture.md) for details and [docs/adr/](docs/adr/) for the
 design decisions behind it.
