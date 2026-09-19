@@ -1,0 +1,74 @@
+[
+  {
+    "id": "SAN-001",
+    "entity_name": "Volga Metals Trading OJSC",
+    "entity_type": "company",
+    "list_name": "OFAC SDN List",
+    "match_supplier_id": "SUP-013",
+    "match_confidence": "exact",
+    "sanction_reason": "Designated under Russia-related sanctions for operating in the metals and mining sector of the Russian economy.",
+    "date_added": "2023-06-14",
+    "country": "Russia",
+    "status": "active"
+  },
+  {
+    "id": "SAN-002",
+    "entity_name": "Sokolov, Dmitri Andreyevich",
+    "entity_type": "individual",
+    "list_name": "OFAC SDN List",
+    "match_supplier_id": "SUP-013",
+    "match_confidence": "exact",
+    "sanction_reason": "Identified as a senior commercial officer of a designated entity; added pursuant to the same Russia sectoral sanctions designation.",
+    "date_added": "2023-06-14",
+    "country": "Russia",
+    "status": "active"
+  },
+  {
+    "id": "SAN-003",
+    "entity_name": "Kolwezi Resources Holding",
+    "entity_type": "company",
+    "list_name": "EU Consolidated Sanctions List",
+    "match_supplier_id": "SUP-003",
+    "match_confidence": "high",
+    "sanction_reason": "Beneficial ownership overlap flagged with an entity sanctioned for links to armed group financing in mineral-producing regions of eastern DRC; listing under review.",
+    "date_added": "2024-08-02",
+    "country": "Democratic Republic of the Congo",
+    "status": "active"
+  },
+  {
+    "id": "SAN-004",
+    "entity_name": "Golden Thread Textile Ltd",
+    "entity_type": "company",
+    "list_name": "UK Sanctions List",
+    "match_supplier_id": null,
+    "match_confidence": "low",
+    "sanction_reason": "Unrelated Hong Kong-registered trading entity sanctioned for export control violations; name closely resembles Golden Thread Textiles (SUP-002) but corporate registration, address, and ownership do not match.",
+    "date_added": "2022-03-19",
+    "country": "Hong Kong",
+    "status": "active"
+  },
+  {
+    "id": "SAN-005",
+    "entity_name": "Petrov Global Trading",
+    "entity_type": "company",
+    "list_name": "UN Security Council Consolidated List",
+    "match_supplier_id": null,
+    "match_confidence": "none",
+    "sanction_reason": "Designated for sanctions evasion related to arms trafficking; no known relationship to any current supplier.",
+    "date_added": "2021-10-05",
+    "country": "Russia",
+    "status": "active"
+  },
+  {
+    "id": "SAN-006",
+    "entity_name": "Sunrise Aviation Ltd",
+    "entity_type": "company",
+    "list_name": "OFAC SDN List",
+    "match_supplier_id": null,
+    "match_confidence": "none",
+    "sanction_reason": "Designated for sanctions evasion involving cargo logistics; no known relationship to any current supplier.",
+    "date_added": "2020-07-22",
+    "country": "United Arab Emirates",
+    "status": "delisted"
+  }
+]

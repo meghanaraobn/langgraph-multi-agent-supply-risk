@@ -1,0 +1,43 @@
+[
+  {"id": "CERT-001", "supplier_id": "SUP-001", "certification_type": "ISO 9001", "issuing_body": "TUV Rheinland", "issue_date": "2023-04-01", "expiry_date": "2026-04-01", "status": "active", "scope": "Quality management for semiconductor and PCB assembly"},
+  {"id": "CERT-002", "supplier_id": "SUP-001", "certification_type": "ISO 14001", "issuing_body": "TUV Rheinland", "issue_date": "2023-04-01", "expiry_date": "2026-04-01", "status": "active", "scope": "Environmental management system"},
+  {"id": "CERT-003", "supplier_id": "SUP-001", "certification_type": "RBA Validated Assessment", "issuing_body": "Responsible Business Alliance", "issue_date": "2024-06-15", "expiry_date": "2027-06-15", "status": "active", "scope": "Labor, ethics, and EHS conformance"},
+
+  {"id": "CERT-004", "supplier_id": "SUP-002", "certification_type": "SA8000", "issuing_body": "Social Accountability International", "issue_date": "2021-05-01", "expiry_date": "2024-05-01", "status": "expired", "scope": "Social accountability at Savar facility"},
+  {"id": "CERT-005", "supplier_id": "SUP-002", "certification_type": "SMETA", "issuing_body": "Sedex", "issue_date": "2022-09-10", "expiry_date": "2024-09-10", "status": "expired", "scope": "4-pillar ethical audit"},
+
+  {"id": "CERT-006", "supplier_id": "SUP-003", "certification_type": "Conflict-Free Sourcing", "issuing_body": "Responsible Minerals Initiative", "issue_date": "2022-01-20", "expiry_date": "2023-01-20", "status": "expired", "scope": "Cobalt supply chain due diligence"},
+
+  {"id": "CERT-007", "supplier_id": "SUP-004", "certification_type": "ISO 9001", "issuing_body": "DEKRA", "issue_date": "2024-02-01", "expiry_date": "2027-02-01", "status": "active", "scope": "Quality management"},
+  {"id": "CERT-008", "supplier_id": "SUP-004", "certification_type": "ISO 14001", "issuing_body": "DEKRA", "issue_date": "2024-02-01", "expiry_date": "2027-02-01", "status": "active", "scope": "Environmental management"},
+  {"id": "CERT-009", "supplier_id": "SUP-004", "certification_type": "ISO 45001", "issuing_body": "DEKRA", "issue_date": "2024-02-01", "expiry_date": "2027-02-01", "status": "active", "scope": "Occupational health and safety"},
+  {"id": "CERT-010", "supplier_id": "SUP-004", "certification_type": "REACH Compliance", "issuing_body": "European Chemicals Agency", "issue_date": "2023-01-01", "expiry_date": "2026-01-01", "status": "active", "scope": "Chemical substance registration"},
+
+  {"id": "CERT-011", "supplier_id": "SUP-005", "certification_type": "ISO 9001", "issuing_body": "Bureau Veritas", "issue_date": "2023-07-01", "expiry_date": "2026-07-01", "status": "active", "scope": "Quality management for electronics assembly"},
+  {"id": "CERT-012", "supplier_id": "SUP-005", "certification_type": "ISO 45001", "issuing_body": "Bureau Veritas", "issue_date": "2023-07-01", "expiry_date": "2026-07-01", "status": "active", "scope": "Occupational health and safety"},
+
+  {"id": "CERT-013", "supplier_id": "SUP-006", "certification_type": "Fair Trade Certified", "issuing_body": "Fairtrade International", "issue_date": "2022-03-01", "expiry_date": "2025-03-01", "status": "active", "scope": "Dried fruit and nut sourcing"},
+
+  {"id": "CERT-014", "supplier_id": "SUP-007", "certification_type": "ISO 9001", "issuing_body": "SGS", "issue_date": "2024-01-10", "expiry_date": "2027-01-10", "status": "active", "scope": "Quality management"},
+  {"id": "CERT-015", "supplier_id": "SUP-007", "certification_type": "ISO 14001", "issuing_body": "SGS", "issue_date": "2024-01-10", "expiry_date": "2027-01-10", "status": "active", "scope": "Environmental management"},
+  {"id": "CERT-016", "supplier_id": "SUP-007", "certification_type": "RBA Validated Assessment", "issuing_body": "Responsible Business Alliance", "issue_date": "2025-02-01", "expiry_date": "2028-02-01", "status": "active", "scope": "Labor, ethics, and EHS conformance"},
+
+  {"id": "CERT-017", "supplier_id": "SUP-008", "certification_type": "SA8000", "issuing_body": "Social Accountability International", "issue_date": "2020-11-01", "expiry_date": "2023-11-01", "status": "expired", "scope": "Social accountability"},
+  {"id": "CERT-018", "supplier_id": "SUP-008", "certification_type": "SMETA", "issuing_body": "Sedex", "issue_date": "2023-05-01", "expiry_date": "2025-05-01", "status": "suspended", "scope": "4-pillar ethical audit - suspended pending investigation"},
+
+  {"id": "CERT-019", "supplier_id": "SUP-009", "certification_type": "ISO 14001", "issuing_body": "Bureau Veritas", "issue_date": "2023-03-01", "expiry_date": "2026-03-01", "status": "active", "scope": "Environmental management"},
+  {"id": "CERT-020", "supplier_id": "SUP-009", "certification_type": "Copper Mark", "issuing_body": "The Copper Mark", "issue_date": "2024-05-01", "expiry_date": "2027-05-01", "status": "active", "scope": "Responsible copper production"},
+
+  {"id": "CERT-021", "supplier_id": "SUP-010", "certification_type": "ISO 9001", "issuing_body": "China Quality Certification Center", "issue_date": "2022-08-01", "expiry_date": "2025-08-01", "status": "active", "scope": "Quality management"},
+  {"id": "CERT-022", "supplier_id": "SUP-010", "certification_type": "RBA Validated Assessment", "issuing_body": "Responsible Business Alliance", "issue_date": "2021-06-01", "expiry_date": "2023-06-01", "status": "expired", "scope": "Labor, ethics, and EHS conformance - not renewed"},
+
+  {"id": "CERT-023", "supplier_id": "SUP-011", "certification_type": "FSC Chain of Custody", "issuing_body": "Forest Stewardship Council", "issue_date": "2024-01-01", "expiry_date": "2029-01-01", "status": "active", "scope": "Sustainable forestry sourcing"},
+  {"id": "CERT-024", "supplier_id": "SUP-011", "certification_type": "ISO 14001", "issuing_body": "Intertek", "issue_date": "2023-09-01", "expiry_date": "2026-09-01", "status": "active", "scope": "Environmental management"},
+  {"id": "CERT-025", "supplier_id": "SUP-011", "certification_type": "PEFC Certified", "issuing_body": "Programme for the Endorsement of Forest Certification", "issue_date": "2023-06-01", "expiry_date": "2028-06-01", "status": "active", "scope": "Sustainable forest management"},
+
+  {"id": "CERT-026", "supplier_id": "SUP-013", "certification_type": "ISO 9001", "issuing_body": "Rostest", "issue_date": "2019-04-01", "expiry_date": "2022-04-01", "status": "expired", "scope": "Quality management - not renewed since 2022"},
+
+  {"id": "CERT-027", "supplier_id": "SUP-014", "certification_type": "ISO 9001", "issuing_body": "SGS", "issue_date": "2024-03-01", "expiry_date": "2027-03-01", "status": "active", "scope": "Quality management"},
+  {"id": "CERT-028", "supplier_id": "SUP-014", "certification_type": "ISO 45001", "issuing_body": "SGS", "issue_date": "2024-03-01", "expiry_date": "2027-03-01", "status": "active", "scope": "Occupational health and safety"},
+  {"id": "CERT-029", "supplier_id": "SUP-014", "certification_type": "RBA Validated Assessment", "issuing_body": "Responsible Business Alliance", "issue_date": "2024-09-01", "expiry_date": "2027-09-01", "status": "active", "scope": "Labor, ethics, and EHS conformance"}
+]

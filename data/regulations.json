@@ -1,0 +1,102 @@
+[
+  {
+    "id": "REG-001",
+    "regulation_name": "Uyghur Forced Labor Prevention Act (UFLPA)",
+    "jurisdiction": "United States",
+    "effective_date": "2022-06-21",
+    "description": "Establishes a rebuttable presumption that goods mined, produced, or manufactured wholly or in part in the Xinjiang Uyghur Autonomous Region, or by entities on the UFLPA Entity List, are made with forced labor and are prohibited from import into the US.",
+    "applicable_industries": ["Electronics Manufacturing", "Apparel Manufacturing", "Textile Manufacturing", "Mining - Cobalt & Copper"],
+    "compliance_requirement": "Importers must provide clear and convincing evidence of no forced labor in the supply chain, including full traceability documentation, upon CBP detention of goods.",
+    "penalty_for_noncompliance": "Denial of entry, seizure of goods, and potential civil or criminal enforcement for knowing violations."
+  },
+  {
+    "id": "REG-002",
+    "regulation_name": "EU Corporate Sustainability Due Diligence Directive (CSDDD)",
+    "jurisdiction": "European Union",
+    "effective_date": "2027-07-26",
+    "description": "Requires large companies operating in the EU to identify, prevent, mitigate, and account for adverse human rights and environmental impacts in their own operations and their upstream and downstream value chains.",
+    "applicable_industries": ["all"],
+    "compliance_requirement": "Implement a human rights and environmental due diligence process, including risk mapping, grievance mechanisms, and annual public reporting.",
+    "penalty_for_noncompliance": "Fines of up to 5% of global net turnover and civil liability for damages."
+  },
+  {
+    "id": "REG-003",
+    "regulation_name": "EU Deforestation Regulation (EUDR)",
+    "jurisdiction": "European Union",
+    "effective_date": "2025-12-30",
+    "description": "Prohibits placing commodities such as timber, cocoa, coffee, palm oil, rubber, and cattle products on the EU market unless proven deforestation-free and legally produced.",
+    "applicable_industries": ["Forestry & Wood Products", "Agriculture - Dried Fruit & Nuts"],
+    "compliance_requirement": "Geolocation-based traceability to plot of origin and a due diligence statement filed for each shipment.",
+    "penalty_for_noncompliance": "Fines up to 4% of EU-wide annual turnover, confiscation of goods, and temporary exclusion from public procurement."
+  },
+  {
+    "id": "REG-004",
+    "regulation_name": "Dodd-Frank Section 1502 (Conflict Minerals Rule)",
+    "jurisdiction": "United States",
+    "effective_date": "2012-08-22",
+    "description": "Requires SEC-registered companies to disclose whether their products contain tin, tantalum, tungsten, or gold sourced from the Democratic Republic of the Congo or adjoining countries in a manner that finances armed conflict.",
+    "applicable_industries": ["Mining - Cobalt & Copper", "Electronics Manufacturing", "Semiconductors"],
+    "compliance_requirement": "Conduct reasonable country-of-origin inquiry and, where necessary, supply chain due diligence aligned with the OECD Due Diligence Guidance, with annual conflict minerals disclosure (Form SD).",
+    "penalty_for_noncompliance": "SEC enforcement action; reputational and contractual risk with downstream buyers."
+  },
+  {
+    "id": "REG-005",
+    "regulation_name": "REACH Regulation",
+    "jurisdiction": "European Union",
+    "effective_date": "2007-06-01",
+    "description": "Regulates the registration, evaluation, authorization, and restriction of chemical substances manufactured or imported into the EU above one tonne per year.",
+    "applicable_industries": ["Specialty Chemicals", "Electronics Manufacturing", "Semiconductors"],
+    "compliance_requirement": "Register substances with ECHA, communicate safety data sheets through the supply chain, and avoid use of substances of very high concern above threshold limits.",
+    "penalty_for_noncompliance": "Market withdrawal, fines set by individual EU member states, and potential criminal liability."
+  },
+  {
+    "id": "REG-006",
+    "regulation_name": "RoHS Directive (Restriction of Hazardous Substances)",
+    "jurisdiction": "European Union",
+    "effective_date": "2006-07-01",
+    "description": "Restricts the use of specific hazardous materials, including lead, mercury, and cadmium, in the manufacture of electrical and electronic equipment.",
+    "applicable_industries": ["Electronics Manufacturing", "Semiconductors", "Electronics Assembly"],
+    "compliance_requirement": "Ensure products placed on the EU market do not exceed maximum concentration values for restricted substances and carry CE marking with supporting technical documentation.",
+    "penalty_for_noncompliance": "Product recall, market withdrawal, and financial penalties determined by member state authorities."
+  },
+  {
+    "id": "REG-007",
+    "regulation_name": "UK Modern Slavery Act",
+    "jurisdiction": "United Kingdom",
+    "effective_date": "2015-03-26",
+    "description": "Requires commercial organizations with UK turnover above a statutory threshold to publish an annual statement describing steps taken to ensure slavery and human trafficking are not occurring in their business or supply chains.",
+    "applicable_industries": ["all"],
+    "compliance_requirement": "Publish an annual modern slavery statement approved by the board and signed by a director, describing supply chain due diligence and risk assessment.",
+    "penalty_for_noncompliance": "Court-ordered injunction to comply; significant reputational risk from non-publication."
+  },
+  {
+    "id": "REG-008",
+    "regulation_name": "California Transparency in Supply Chains Act",
+    "jurisdiction": "United States (California)",
+    "effective_date": "2012-01-01",
+    "description": "Requires large retailers and manufacturers doing business in California to disclose their efforts to eradicate slavery and human trafficking from their direct supply chains.",
+    "applicable_industries": ["all"],
+    "compliance_requirement": "Publicly disclose verification, audit, certification, internal accountability, and training practices related to supply chain human trafficking risk.",
+    "penalty_for_noncompliance": "Injunctive relief action by the California Attorney General; no direct monetary fine."
+  },
+  {
+    "id": "REG-009",
+    "regulation_name": "OFAC Sanctions Program",
+    "jurisdiction": "United States",
+    "effective_date": "1950-12-17",
+    "description": "Administers and enforces economic and trade sanctions against targeted foreign countries, entities, and individuals identified on the Specially Designated Nationals (SDN) list, in support of US foreign policy and national security goals.",
+    "applicable_industries": ["all"],
+    "compliance_requirement": "Screen counterparties against the SDN list and other sanctions lists prior to and throughout the business relationship; block or reject prohibited transactions.",
+    "penalty_for_noncompliance": "Civil penalties up to the greater of a set statutory amount or twice the value of the transaction per violation; criminal prosecution for willful violations."
+  },
+  {
+    "id": "REG-010",
+    "regulation_name": "EU Batteries Regulation",
+    "jurisdiction": "European Union",
+    "effective_date": "2024-08-18",
+    "description": "Sets due diligence obligations for economic operators placing batteries on the EU market regarding the sourcing of cobalt, lithium, nickel, and natural graphite raw materials.",
+    "applicable_industries": ["Mining - Cobalt & Copper", "Electronics Manufacturing"],
+    "compliance_requirement": "Establish a supply chain due diligence policy aligned with OECD guidance, conduct third-party verification, and publish results.",
+    "penalty_for_noncompliance": "Market surveillance action, product withdrawal, and fines set by individual EU member states."
+  }
+]

@@ -1,0 +1,145 @@
+[
+  {
+    "id": "INC-001",
+    "supplier_id": "SUP-002",
+    "incident_type": "labor_violation",
+    "date": "2024-11-03",
+    "severity": "high",
+    "description": "Labor rights NGO report documented excessive mandatory overtime (up to 80 hrs/week during peak season) and withheld wages for approximately 200 workers at the Savar facility.",
+    "source": "Clean Clothes Campaign field report",
+    "status": "under_investigation",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-002",
+    "supplier_id": "SUP-002",
+    "incident_type": "wage_theft",
+    "date": "2025-02-14",
+    "severity": "medium",
+    "description": "Former workers filed a labor board complaint alleging unpaid overtime wages for the September-December 2024 production cycle.",
+    "source": "Bangladesh Labor Board filing",
+    "status": "open",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-003",
+    "supplier_id": "SUP-003",
+    "incident_type": "child_labor",
+    "date": "2024-06-19",
+    "severity": "critical",
+    "description": "Investigative journalism report alleged use of underage labor at an artisanal mining site feeding into the supplier's cobalt aggregation network in Lualaba Province.",
+    "source": "Reuters investigative report",
+    "status": "under_investigation",
+    "resolution_notes": "Third-party audit commissioned; site access restricted pending outcome."
+  },
+  {
+    "id": "INC-004",
+    "supplier_id": "SUP-003",
+    "incident_type": "safety_accident",
+    "date": "2025-01-08",
+    "severity": "high",
+    "description": "Tunnel collapse at an affiliated artisanal mining site resulted in 3 fatalities. Supplier's traceability of ore origin for this shipment could not be confirmed.",
+    "source": "DRC Ministry of Mines incident report",
+    "status": "open",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-005",
+    "supplier_id": "SUP-005",
+    "incident_type": "fire",
+    "date": "2023-08-22",
+    "severity": "medium",
+    "description": "Electrical fire in the SMT line building caused a 6-day production halt. No injuries reported. Root cause traced to overloaded circuit panel.",
+    "source": "Vietnam Fire Prevention Department report",
+    "status": "resolved",
+    "resolution_notes": "Electrical systems upgraded and re-inspected; corrective action verified by third-party auditor in October 2023."
+  },
+  {
+    "id": "INC-006",
+    "supplier_id": "SUP-006",
+    "incident_type": "forced_labor",
+    "date": "2024-09-30",
+    "severity": "high",
+    "description": "Seasonal harvest workers reported passport confiscation and debt bondage practices by a labor recruitment agency contracted by the supplier.",
+    "source": "International Labor Rights Forum report",
+    "status": "under_investigation",
+    "resolution_notes": "Supplier disputes findings; independent grievance mechanism review in progress."
+  },
+  {
+    "id": "INC-007",
+    "supplier_id": "SUP-008",
+    "incident_type": "safety_accident",
+    "date": "2024-03-11",
+    "severity": "critical",
+    "description": "Structural crack discovered in the Ashulia facility's east wing following a factory inspection; building partially evacuated. Similar to warning signs preceding prior regional factory collapses.",
+    "source": "Bangladesh Accord Foundation inspection",
+    "status": "open",
+    "resolution_notes": "Partial closure ordered by Accord Foundation pending structural remediation."
+  },
+  {
+    "id": "INC-008",
+    "supplier_id": "SUP-008",
+    "incident_type": "labor_violation",
+    "date": "2024-05-06",
+    "severity": "medium",
+    "description": "Audit found underage worker (age 15) employed in the finishing department using falsified identification documents.",
+    "source": "Third-party social compliance audit",
+    "status": "resolved",
+    "resolution_notes": "Worker removed from site per remediation protocol, family income support provided, age verification process overhauled."
+  },
+  {
+    "id": "INC-009",
+    "supplier_id": "SUP-009",
+    "incident_type": "environmental_spill",
+    "date": "2024-12-02",
+    "severity": "medium",
+    "description": "Tailings pond overflow released an estimated 400 cubic meters of process water into a seasonal creek bed near the Antofagasta site.",
+    "source": "Chilean Superintendency of the Environment (SMA) filing",
+    "status": "resolved",
+    "resolution_notes": "Containment completed within 48 hours; SMA fine paid; remediation plan approved March 2025."
+  },
+  {
+    "id": "INC-010",
+    "supplier_id": "SUP-010",
+    "incident_type": "labor_violation",
+    "date": "2024-10-15",
+    "severity": "high",
+    "description": "Recruitment records reviewed during an unannounced audit showed workers transferred through a regional labor transfer program associated with elevated forced-labor risk under UFLPA guidance.",
+    "source": "Independent supply chain audit",
+    "status": "under_investigation",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-011",
+    "supplier_id": "SUP-012",
+    "incident_type": "wage_theft",
+    "date": "2025-04-20",
+    "severity": "medium",
+    "description": "Workers reported delayed payroll (up to 6 weeks late) on three occasions over the past year; no formal grievance mechanism in place at the facility.",
+    "source": "Site visit notes from procurement team",
+    "status": "open",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-012",
+    "supplier_id": "SUP-013",
+    "incident_type": "corruption",
+    "date": "2023-11-11",
+    "severity": "high",
+    "description": "Local news reporting linked a company director to an undisclosed bribery investigation involving customs officials over metals export documentation.",
+    "source": "Regional business press report",
+    "status": "under_investigation",
+    "resolution_notes": null
+  },
+  {
+    "id": "INC-013",
+    "supplier_id": "SUP-005",
+    "incident_type": "strike",
+    "date": "2025-06-02",
+    "severity": "low",
+    "description": "One-day work stoppage over cafeteria conditions; resolved same day after facility management met with worker representatives.",
+    "source": "Internal supplier notification",
+    "status": "resolved",
+    "resolution_notes": "Cafeteria vendor replaced within two weeks."
+  }
+]

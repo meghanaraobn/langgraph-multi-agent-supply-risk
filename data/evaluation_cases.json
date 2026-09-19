@@ -1,0 +1,342 @@
+[
+  {
+    "id": "EVAL-001",
+    "supplier_id": "SUP-001",
+    "user_request": "Investigate Meridian Electronics Co. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Baseline clean supplier check for a Tier 1 electronics manufacturer with current certifications, no incidents, and no sanctions matches.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 74
+    },
+    "notes": "Regression case to confirm the pipeline does not over-flag a clean supplier."
+  },
+  {
+    "id": "EVAL-002",
+    "supplier_id": "SUP-002",
+    "user_request": "Investigate Golden Thread Textiles. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Apparel supplier with two expired social-compliance certifications and an open labor board wage complaint layered on top of an unresolved labor rights NGO report.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["expired_certification", "labor_violation", "wage_theft", "low_esg_score"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 2,
+      "open_incidents": 2,
+      "sanctions_hits": 0,
+      "esg_score": 39
+    },
+    "notes": "Tests compound risk scoring when multiple medium-severity signals stack; a UK-listed 'Golden Thread Textile Ltd' sanctions record should be evaluated and correctly dismissed as a name-only false positive (SAN-004)."
+  },
+  {
+    "id": "EVAL-003",
+    "supplier_id": "SUP-003",
+    "user_request": "Investigate Cobalt Basin Mining Ltd. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Cobalt mining supplier with an active child labor investigation, a fatal safety incident with broken chain-of-custody, an expired conflict-minerals certification, and a beneficial-ownership sanctions link on its parent company.",
+    "expected_risk_level": "critical",
+    "expected_route": "human_review",
+    "expected_flags": ["child_labor", "safety_accident", "expired_certification", "sanctions_match", "conflict_minerals_risk"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 1,
+      "open_incidents": 2,
+      "sanctions_hits": 1,
+      "esg_score": 24
+    },
+    "notes": "Primary critical-path test case: must trigger UFLPA-style forced-labor reasoning, Dodd-Frank conflict minerals reasoning, and route to human review on the parent-company sanctions link (SAN-003)."
+  },
+  {
+    "id": "EVAL-004",
+    "supplier_id": "SUP-004",
+    "user_request": "Investigate Rhine Valley Chemicals GmbH. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Specialty chemicals supplier with full active certification coverage, strong ESG score, and REACH compliance on file.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 82
+    },
+    "notes": "Confirms REACH-relevant regulation lookup is triggered without producing false risk flags."
+  },
+  {
+    "id": "EVAL-005",
+    "supplier_id": "SUP-005",
+    "user_request": "Investigate Pacific Rim Assembly. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Electronics assembler with one resolved fire incident and one resolved one-day strike, both fully remediated with verified corrective actions.",
+    "expected_risk_level": "medium",
+    "expected_route": "final_report",
+    "expected_flags": ["resolved_safety_incident"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 58
+    },
+    "notes": "Tests that resolved historical incidents lower severity weighting relative to open incidents and do not force human review on their own."
+  },
+  {
+    "id": "EVAL-006",
+    "supplier_id": "SUP-006",
+    "user_request": "Investigate Anatolia Agri Exports. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Agricultural exporter under active investigation for forced labor practices by a third-party recruitment agency, despite holding a valid Fair Trade certification.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["forced_labor", "certification_scope_mismatch"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 1,
+      "sanctions_hits": 0,
+      "esg_score": 45
+    },
+    "notes": "Tests that a valid certification does not suppress a credible, unresolved forced-labor allegation from a third-party labor recruiter."
+  },
+  {
+    "id": "EVAL-007",
+    "supplier_id": "SUP-008",
+    "user_request": "Investigate Dhaka Weave Mills. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Textile mill with a critical open structural safety finding, a suspended ethical audit certification, and a resolved underage-labor incident from the prior year.",
+    "expected_risk_level": "critical",
+    "expected_route": "human_review",
+    "expected_flags": ["structural_safety_risk", "suspended_certification", "prior_child_labor_incident", "low_esg_score"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 1,
+      "open_incidents": 1,
+      "sanctions_hits": 0,
+      "esg_score": 31
+    },
+    "notes": "Building-safety scenario modeled on real-world Bangladesh RMG sector risk factors; validates severity escalation on 'critical' incident severity alone."
+  },
+  {
+    "id": "EVAL-008",
+    "supplier_id": "SUP-009",
+    "user_request": "Investigate Andes Copper Corp. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Copper miner with a resolved environmental spill, active Copper Mark certification, and strong recent ESG trend.",
+    "expected_risk_level": "medium",
+    "expected_route": "final_report",
+    "expected_flags": ["resolved_environmental_incident"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 61
+    },
+    "notes": "Tests environmental-incident handling distinct from labor incidents; expects fine payment and regulator sign-off to count as verified remediation."
+  },
+  {
+    "id": "EVAL-009",
+    "supplier_id": "SUP-010",
+    "user_request": "Investigate Shenzhen Circuit Works. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Electronics manufacturer with an expired RBA certification and an open audit finding describing a labor transfer program pattern associated with UFLPA forced-labor risk.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["expired_certification", "uflpa_risk_indicator", "forced_labor_risk"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 1,
+      "open_incidents": 1,
+      "sanctions_hits": 0,
+      "esg_score": 42
+    },
+    "notes": "Primary UFLPA regulation-matching test case; the compliance agent must connect the incident description to REG-001 without an explicit keyword match on 'Xinjiang'."
+  },
+  {
+    "id": "EVAL-010",
+    "supplier_id": "SUP-011",
+    "user_request": "Investigate Nordic Timber Group. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Forestry supplier with full active FSC and PEFC certification, excellent ESG score, and no incidents or sanctions history.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 91
+    },
+    "notes": "Best-in-class control case; also validates EU Deforestation Regulation (EUDR) applicability lookup for forestry commodities."
+  },
+  {
+    "id": "EVAL-011",
+    "supplier_id": "SUP-012",
+    "user_request": "Investigate Lagos Textile Hub. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Small apparel supplier with zero certifications on file, an open wage-theft complaint, and no formal grievance mechanism.",
+    "expected_risk_level": "medium",
+    "expected_route": "final_report",
+    "expected_flags": ["no_certifications_on_file", "wage_theft"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 1,
+      "sanctions_hits": 0,
+      "esg_score": 33
+    },
+    "notes": "Tests the 'no data' case (absence of any certification record) is itself surfaced as a compliance gap rather than silently treated as compliant."
+  },
+  {
+    "id": "EVAL-012",
+    "supplier_id": "SUP-013",
+    "user_request": "Investigate Volga Metals Trading. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Metals trader with an exact-match active OFAC SDN designation on both the company and its commercial director, plus an unresolved corruption investigation.",
+    "expected_risk_level": "critical",
+    "expected_route": "human_review",
+    "expected_flags": ["sanctions_match", "corruption_investigation", "expired_certification"],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 1,
+      "open_incidents": 1,
+      "sanctions_hits": 2,
+      "esg_score": 27
+    },
+    "notes": "Hard-stop scenario: any exact-confidence sanctions match should force human_review regardless of other scores; used to test that routing logic short-circuits on sanctions hits."
+  },
+  {
+    "id": "EVAL-013",
+    "supplier_id": "SUP-014",
+    "user_request": "Investigate Bangalore Tech Components. Full due diligence across compliance, risk, and sustainability.",
+    "scenario_description": "Electronics component maker in India with full active certification coverage, no incidents, and solid ESG performance.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 71
+    },
+    "notes": "Second clean-supplier control case, differentiated geography, to guard against false positives tied to country-of-origin bias."
+  },
+  {
+    "id": "EVAL-014",
+    "supplier_id": "SUP-007",
+    "user_request": "Check Silverline Semiconductors' incident and sanctions history and their sustainability performance. No need to review their certifications.",
+    "scenario_description": "Ambiguous edge case: supplier has no incidents or sanctions and strong certifications, but very high absolute carbon emissions typical of semiconductor fabrication.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": ["high_absolute_emissions"],
+    "expected_agents_triggered": ["sustainability_agent", "risk_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": 79
+    },
+    "notes": "Tests that the sustainability agent distinguishes industry-normalized emissions intensity from raw tonnage so semiconductor fabs are not unfairly penalized versus a small supplier."
+  },
+  {
+    "id": "EVAL-015",
+    "supplier_id": "SUP-002",
+    "user_request": "Just check if Golden Thread Textiles has any expired or missing certifications. I don't need anything else right now.",
+    "scenario_description": "Narrow tool-selection test on the same supplier as EVAL-002: only certifications were asked about, so only the Compliance Agent should run, even though this supplier also has real, discoverable incident and sustainability findings.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["expired_certification"],
+    "expected_agents_triggered": ["compliance_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 2,
+      "open_incidents": null,
+      "sanctions_hits": null,
+      "esg_score": null
+    },
+    "notes": "Primary tool-selection test case. risk_level/route are best-effort predictions based on compliance findings alone (2 expired certs, both high severity observed in manual testing) -- a mismatch here is informative about how the Risk Analyst weighs a single dimension, not necessarily a pipeline defect."
+  },
+  {
+    "id": "EVAL-016",
+    "supplier_id": "SUP-013",
+    "user_request": "Screen Volga Metals Trading against sanctions lists and check their incident history. Skip certifications and sustainability for now.",
+    "scenario_description": "Narrow tool-selection test on the same supplier as EVAL-012: only the Risk Agent should run. The real OFAC sanctions match should still be found and should still force human review on its own.",
+    "expected_risk_level": "critical",
+    "expected_route": "human_review",
+    "expected_flags": ["sanctions_match", "corruption_investigation"],
+    "expected_agents_triggered": ["risk_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": null,
+      "open_incidents": 1,
+      "sanctions_hits": 2,
+      "esg_score": null
+    },
+    "notes": "Tests that an exact sanctions match forces human_review even when it is the only dimension checked -- the hard-stop behavior should not depend on compliance/sustainability also having run."
+  },
+  {
+    "id": "EVAL-017",
+    "supplier_id": "SUP-003",
+    "user_request": "What is Cobalt Basin Mining Ltd's sustainability and ESG performance? No need to check compliance or incident history.",
+    "scenario_description": "Narrow tool-selection test on the same supplier as EVAL-003: only the Sustainability Agent should run, in isolation from the (separately, very serious) compliance and risk findings on this supplier.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["low_esg_score"],
+    "expected_agents_triggered": ["sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": null,
+      "open_incidents": null,
+      "sanctions_hits": null,
+      "esg_score": 24
+    },
+    "notes": "risk_level/route are best-effort predictions from sustainability findings alone (ESG score 24, no report on file, no science-based targets -- three high-severity findings observed in manual testing)."
+  },
+  {
+    "id": "EVAL-018",
+    "supplier_id": "SUP-011",
+    "user_request": "Check Nordic Timber Group's certifications and any reported incidents or sanctions. Sustainability data isn't needed for this check.",
+    "scenario_description": "Narrow tool-selection test on a clean supplier: only Compliance and Risk should run. Since the supplier has no real issues in either dimension, this should resolve cleanly with no findings.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "risk_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": 0,
+      "sanctions_hits": 0,
+      "esg_score": null
+    },
+    "notes": "Two-agent (not three, not one) tool-selection case on a clean supplier -- also exercises the deterministic zero-findings path in the Risk Analyst when only a subset of specialists ran."
+  },
+  {
+    "id": "EVAL-019",
+    "supplier_id": "SUP-012",
+    "user_request": "Just check Lagos Textile Hub's certifications, nothing else.",
+    "scenario_description": "Narrow tool-selection test combined with the missing-information/no-certs case from EVAL-011: only Compliance should run, and it should find zero certifications on file.",
+    "expected_risk_level": "high",
+    "expected_route": "human_review",
+    "expected_flags": ["no_certifications_on_file"],
+    "expected_agents_triggered": ["compliance_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": null,
+      "sanctions_hits": null,
+      "esg_score": null
+    },
+    "notes": "Combines tool-selection and missing-information detection: compliance_agent alone should surface the total absence of certifications as a finding, per its own instructions, without needing any other specialist to run."
+  },
+  {
+    "id": "EVAL-020",
+    "supplier_id": "SUP-009",
+    "user_request": "Check Andes Copper Corp's certifications and sustainability performance. Incident and sanctions history isn't needed right now.",
+    "scenario_description": "Narrow tool-selection test on a moderate-profile supplier: Compliance and Sustainability should run, Risk should not, even though this supplier does have a (separately, already-resolved) environmental incident on file.",
+    "expected_risk_level": "low",
+    "expected_route": "final_report",
+    "expected_flags": [],
+    "expected_agents_triggered": ["compliance_agent", "sustainability_agent"],
+    "ground_truth_findings": {
+      "certifications_expired": 0,
+      "open_incidents": null,
+      "sanctions_hits": null,
+      "esg_score": 61
+    },
+    "notes": "Moderate ESG score (61) is a genuine judgment-call boundary case for the sustainability agent's 'only report genuine gaps' instruction -- useful for observing where that threshold actually sits in practice."
+  }
+]
