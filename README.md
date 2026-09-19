@@ -97,14 +97,21 @@ design decisions behind it.
 
 ## Project layout
 
-- `src/supplyguard/agents/` — supervisor, specialist agents, and the risk analyst
-- `src/supplyguard/graph/` — LangGraph state, nodes, routing, and workflow assembly
-- `src/supplyguard/tools/` — tool implementations used by agents
-- `src/supplyguard/rag/` — PDF parsing, chunking, embeddings, and Weaviate vector store for
+- `src/supplyguard/agents/` — Supervisor, Supplier Agent, the four specialists, Risk Analyst,
+  Human Review, and shared evidence-grounding logic
+- `src/supplyguard/graph/` — LangGraph state, routing functions, workflow assembly, and the
+  Postgres checkpointer
+- `src/supplyguard/tools/` — one narrow, hard-coded query per tool (compliance, risk,
+  sustainability, RAG, supplier), so every finding stays auditable
+- `src/supplyguard/rag/` — PDF parsing, chunking, embeddings, and the Weaviate vector store for
   the RAG Agent's document ingestion/retrieval pipeline
-- `src/supplyguard/services/` — investigation orchestration, risk engine, report generation
 - `src/supplyguard/api/` — FastAPI routes and request/response schemas
-- `src/supplyguard/mcp/` — MCP server exposing SupplyGuard tools
+- `src/supplyguard/data/` — JSON-backed repository, Postgres ORM models + repository, and the
+  seed script that loads one into the other
+- `src/supplyguard/models/` — Pydantic domain models: supplier, compliance, risk, sustainability,
+  findings, investigation
+- `src/supplyguard/observability/` — a custom callback handler logging per-node latency, retries,
+  and token usage, alongside LangSmith tracing
 - `src/supplyguard/evaluation/` — evaluation dataset, evaluator, and metrics
 - `data/` — sample/fixture data used by tools and evaluation, including `data/documents/` (the
   synthetic supplier audit report PDFs ingested by the RAG pipeline)
