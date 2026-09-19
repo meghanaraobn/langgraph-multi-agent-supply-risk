@@ -19,53 +19,69 @@ output, and what "done" means for the evaluation harness) are in
 
 ## Architecture
 
-A supervisor agent routes an investigation across specialist agents (Compliance, Risk,
-Sustainability, RAG) that run in parallel, each backed by its own tools. The RAG specialist
-searches unstructured supplier documents (audit reports, disclosures) ingested as PDFs into
-Weaviate, using sentence-transformers embeddings, rather than querying structured
-Postgres/JSON records like the other three. Findings are merged by a Risk Analyst node into a
-risk assessment. High-risk cases are routed to human review before a final report is produced.
+A supervisor agent routes an investigation across four specialist agents that run in parallel,
+each backed by its own tools. A Risk Analyst merges their findings into one risk assessment, and
+high-risk cases are routed to a human reviewer before a final report is produced.
 
 ### Investigation flow
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '16px'}, 'flowchart': {'nodeSpacing': 70, 'rankSpacing': 95}}}%%
+%%{init: {'themeVariables': {'fontSize': '16px'}, 'flowchart': {'nodeSpacing': 65, 'rankSpacing': 90}}}%%
 flowchart TD
-    Client[Client] -->|HTTP| UV[Uvicorn ASGI server]
-    UV --> API["FastAPI routes<br/>(Pydantic request/response schemas)"]
-    API -->|background task| SA
+    Client([Client]) --> API[FastAPI]
+    API --> SA
 
-    subgraph LG["LangGraph StateGraph — InvestigationState (Postgres checkpointer)"]
-        SA["<b>Supplier Agent</b><br/>looks up the supplier record from its ID"] -->|found| SUP
-        SA -->|not found| END1([END])
-        SUP["<b>Supervisor</b><br/>decides which specialists this case needs"] -->|"route_to_specialists() fan-out"| CA
+    subgraph LG["LangGraph — InvestigationState (Postgres-checkpointed, resumable)"]
+        SA["<b>Supplier Agent</b><br/>looks up the supplier record"] -->|found| SUP
+        SA -->|not found| END1([End])
+
+        SUP["<b>Supervisor</b><br/>decides which specialists to run"] --> CA
         SUP --> RSK
         SUP --> SUS
         SUP --> RAG
-        CA["<b>Compliance Agent</b><br/>certification validity + sanctions-list hits"] --> RAN
-        RSK["<b>Risk Agent</b><br/>incident history: severity vs. resolved status"] --> RAN
-        SUS["<b>Sustainability Agent</b><br/>ESG/emissions data + which regulations apply"] --> RAN
-        RAG["<b>RAG Agent</b><br/>searches audit-report PDFs for supporting evidence"] --> RAN
-        RAN["<b>Risk Analyst</b><br/>merges all findings into one risk level + flags"] -->|normal risk| END2([END: Final Report])
-        RAN -->|high / critical risk| HR
-        HR["<b>Human Review</b><br/>a person approves, rejects, or asks for more info"] -->|approve / reject| END2
-        HR -->|request more info| SUP
-    end
 
-    CA -.-> PG[("Postgres")]
-    RSK -.->|"structured-data tools: certifications, incidents, sanctions, sustainability, regulations"| PG
-    SUS -.-> PG
-    RAG -.->|search_documents| WV[("Weaviate")]
-    SUP -.->|"LLM calls — every agent node, via LangChain"| LLM["Azure OpenAI<br/>(ChatOpenAI)"]
-    LG -.->|traces| LS[LangSmith]
+        CA["<b>Compliance Agent</b><br/>certifications + sanctions hits"] --> RAN
+        RSK["<b>Risk Agent</b><br/>incident severity + status"] --> RAN
+        SUS["<b>Sustainability Agent</b><br/>ESG data + applicable regulations"] --> RAN
+        RAG["<b>RAG Agent</b><br/>evidence from audit-report PDFs"] --> RAN
+
+        RAN["<b>Risk Analyst</b><br/>merges findings into one risk level"] -->|normal| END2([End: report])
+        RAN -->|high / critical| HR
+
+        HR["<b>Human Review</b><br/>approve, reject, or ask for more info"] -->|approve / reject| END2
+        HR -->|more info needed| SUP
+    end
 ```
 
-Solid arrows are graph control flow; dashed arrows are data/model access.
+### What each agent does
+
+| Agent | Responsibility | Reads from |
+|---|---|---|
+| Supplier Agent | Resolves the supplier record from its ID | Postgres |
+| Supervisor | Picks which specialists a case needs; re-plans if a reviewer asks for more information | — |
+| Compliance Agent | Certification validity and sanctions-list hits | Postgres |
+| Risk Agent | Incident history — severity weighed against resolved/open status | Postgres |
+| Sustainability Agent | ESG/emissions data and which regulations apply | Postgres |
+| RAG Agent | Searches on-site audit-report PDFs for supporting evidence | Weaviate (hybrid BM25 + vector search) |
+| Risk Analyst | Merges every specialist's findings into one risk level + flags | — |
+| Human Review | A person approves, rejects, or requests more information; pauses the graph until they do | Postgres (checkpoint) |
+
+### System context
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '16px'}}}%%
+flowchart LR
+    Client([Client]) --> API["FastAPI + LangGraph<br/>Supervisor, 4 specialists, Risk Analyst"]
+    API --> PG[("Postgres<br/>supplier data + checkpoints")]
+    API --> WV[("Weaviate<br/>audit-report chunks")]
+    API --> LLM["Azure OpenAI<br/>ChatOpenAI, every agent node"]
+    API -.->|traces| LS[LangSmith]
+```
 
 ### RAG ingestion (offline, one-time)
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '18px'}, 'flowchart': {'nodeSpacing': 55, 'rankSpacing': 85}}}%%
+%%{init: {'themeVariables': {'fontSize': '16px'}}}%%
 flowchart LR
     GEN["generate_synthetic_pdfs.py<br/>(reportlab)"] --> PDF[/Raw audit-report PDFs/]
     PDF --> PARSE["pdfplumber<br/>layout/table-aware parsing"]
