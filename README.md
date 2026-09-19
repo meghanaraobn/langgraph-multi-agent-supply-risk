@@ -52,9 +52,9 @@ flowchart TD
         HR -->|request more info| SUP
     end
 
-    CA -.->|certification + sanctions tools| PG[("Postgres")]
-    RSK -.->|incident + sanctions tools| PG
-    SUS -.->|sustainability + regulation tools| PG
+    CA -.-> PG[("Postgres")]
+    RSK -.->|"structured-data tools: certifications, incidents, sanctions, sustainability, regulations"| PG
+    SUS -.-> PG
     RAG -.->|search_documents| WV[("Weaviate")]
     SUP -.->|"LLM calls — every agent node, via LangChain"| LLM["Azure OpenAI<br/>(ChatOpenAI)"]
     LG -.->|traces| LS[LangSmith]
