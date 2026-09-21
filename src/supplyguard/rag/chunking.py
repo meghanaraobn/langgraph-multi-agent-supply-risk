@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import NLTKTextSplitter, RecursiveCharacterTextSplitter
 
 from supplyguard.rag.parsing import PageContent
 
@@ -29,14 +29,33 @@ class Chunk:
     text: str
 
 
-def chunk_pages(pages: list[PageContent], document_id: str) -> list[Chunk]:
-    splitter = RecursiveCharacterTextSplitter(
+def _split_page_text(text: str) -> list[str]:
+    """Splits on sentence boundaries first. NLTKTextSplitter has no size cap
+    of its own -- a piece with no sentence-ending punctuation (e.g. the
+    pipe-delimited tables parsing.py appends, see _render_table) comes back
+    as a single oversized piece, so anything still over _CHUNK_SIZE is
+    re-split by character to bound it (bge-large-en-v1.5 truncates silently
+    past 512 tokens; see embeddings.py)."""
+    sentence_splitter = NLTKTextSplitter(
+        separator=" ", chunk_size=_CHUNK_SIZE, chunk_overlap=_CHUNK_OVERLAP
+    )
+    fallback_splitter = RecursiveCharacterTextSplitter(
         chunk_size=_CHUNK_SIZE, chunk_overlap=_CHUNK_OVERLAP
     )
 
+    pieces: list[str] = []
+    for piece in sentence_splitter.split_text(text):
+        if len(piece) > _CHUNK_SIZE:
+            pieces.extend(fallback_splitter.split_text(piece))
+        else:
+            pieces.append(piece)
+    return pieces
+
+
+def chunk_pages(pages: list[PageContent], document_id: str) -> list[Chunk]:
     chunks: list[Chunk] = []
     for page in pages:
-        for index, piece in enumerate(splitter.split_text(page.text)):
+        for index, piece in enumerate(_split_page_text(page.text)):
             chunk_id = f"{document_id}-p{page.page_number}-c{index}"
             chunks.append(
                 Chunk(

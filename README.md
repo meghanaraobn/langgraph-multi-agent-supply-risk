@@ -1,7 +1,6 @@
 # SupplyGuard AI
 
 A multi-agent supply chain risk investigation system built with LangGraph and FastAPI.
-Backend-only project — no frontend is planned.
 
 ## Problem statement
 

@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 
+import nltk
 from fastapi import FastAPI
 
 from supplyguard.api import router
@@ -17,8 +18,22 @@ from supplyguard.graph.checkpointer import get_checkpointer
 logger = logging.getLogger("supplyguard.main")
 
 
+def _ensure_nltk_data() -> None:
+    """chunk_pages' NLTKTextSplitter needs the punkt_tab sentence-boundary
+    model; check at boot rather than failing on the first document upload."""
+    try:
+        nltk.data.find("tokenizers/punkt_tab")
+    except LookupError as exc:
+        raise RuntimeError(
+            "NLTK 'punkt_tab' tokenizer data is missing (required by "
+            "supplyguard.rag.chunking). Run `python -m nltk.downloader punkt_tab`, "
+            "or rebuild the Docker image so it's baked in."
+        ) from exc
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _ensure_nltk_data()
     yield
     # Close the connection pool explicitly on shutdown rather than relying
     # on ConnectionPool.__del__ during interpreter finalization, which
