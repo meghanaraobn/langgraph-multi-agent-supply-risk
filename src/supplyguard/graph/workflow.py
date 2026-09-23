@@ -43,14 +43,14 @@ def build_investigation_graph():
     # which package a caller happens to touch first.
     from supplyguard.agents import (
         compliance_agent_node,
+        human_review_node,
         rag_agent_node,
         risk_agent_node,
         risk_analyst_node,
         supervisor_node,
+        supplier_agent_node,
         sustainability_agent_node,
     )
-    from supplyguard.agents.human_review import human_review_node
-    from supplyguard.agents.supplier_agent import supplier_agent_node
 
     builder = StateGraph(InvestigationState)
 

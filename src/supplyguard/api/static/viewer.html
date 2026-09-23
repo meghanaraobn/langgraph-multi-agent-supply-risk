@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SupplyGuard -- Investigation Viewer</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161922;
+    --border: #262b38;
+    --text: #e6e8ee;
+    --muted: #8b93a7;
+    --accent: #5b9dff;
+    --green: #3ecf8e;
+    --amber: #e6b450;
+    --red: #ef5b5b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 64px;
+  }
+  main { width: 100%; max-width: 780px; }
+  h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  textarea, input[type=text] {
+    width: 100%;
+    background: #0c0e13;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea { min-height: 64px; }
+  .row { display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+  button {
+    background: var(--accent);
+    color: #05070c;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .divider { color: var(--muted); font-size: 12px; }
+
+  #statusBar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge.running { background: rgba(91,157,255,0.15); color: var(--accent); }
+  .badge.awaiting_human_review { background: rgba(230,180,80,0.15); color: var(--amber); }
+  .badge.completed { background: rgba(62,207,142,0.15); color: var(--green); }
+  .badge.error { background: rgba(239,91,91,0.15); color: var(--red); }
+  #invIdLabel { color: var(--muted); font-family: ui-monospace, monospace; font-size: 12px; }
+
+  #timeline { display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .step.interrupt { border-left-color: var(--amber); }
+  .step.error { border-left-color: var(--red); }
+  .step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    cursor: pointer;
+  }
+  .step-node { font-weight: 600; font-size: 13.5px; }
+  .step-meta { color: var(--muted); font-size: 11px; }
+  .step-body {
+    margin-top: 8px;
+    display: none;
+    font-size: 12px;
+  }
+  .step-body.open { display: block; }
+  pre {
+    background: #0c0e13;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    margin: 0;
+    color: #c7ccd8;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  #reviewCard { display: none; }
+  #reviewCard select, #reviewCard textarea, #reviewCard input {
+    margin-bottom: 8px;
+  }
+
+  #resultCard { display: none; }
+  #empty { color: var(--muted); font-size: 13px; padding: 20px 0; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SupplyGuard -- Investigation Viewer</h1>
+  <div class="sub">Live agent trace: supplier_agent &rarr; supervisor &rarr; specialists &rarr; risk_analyst &rarr; (human_review). No refreshing needed -- this stays open and updates itself.</div>
+
+  <div class="panel">
+    <label for="query">Start a new investigation</label>
+    <textarea id="query" placeholder="Investigate Cobalt Basin Mining. Full due diligence across compliance, risk, and sustainability."></textarea>
+    <div class="row">
+      <button id="startBtn">Start &amp; watch</button>
+      <span class="divider">or</span>
+      <input type="text" id="watchId" placeholder="paste an existing investigation_id" style="max-width:320px;">
+      <button id="watchBtn" class="secondary">Watch</button>
+    </div>
+  </div>
+
+  <div id="statusBar" class="panel">
+    <span id="statusBadge" class="badge running">running</span>
+    <span id="invIdLabel"></span>
+  </div>
+
+  <div id="reviewCard" class="panel">
+    <div style="font-weight:600; margin-bottom:6px;">Human review requested</div>
+    <div id="reviewMessage" style="font-size:13px; color:var(--muted); margin-bottom:10px;"></div>
+    <pre id="reviewPayload"></pre>
+    <label style="margin-top:10px;">Decision</label>
+    <select id="decisionSelect" style="width:100%; background:#0c0e13; color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px;">
+      <option value="APPROVE">APPROVE</option>
+      <option value="REJECT">REJECT</option>
+      <option value="REQUEST_MORE_INFORMATION">REQUEST_MORE_INFORMATION</option>
+    </select>
+    <label>Reviewer (optional)</label>
+    <input type="text" id="reviewerInput">
+    <label>Notes (optional)</label>
+    <textarea id="notesInput"></textarea>
+    <button id="submitReviewBtn">Submit decision</button>
+  </div>
+
+  <div id="resultCard" class="panel">
+    <div style="font-weight:600; margin-bottom:8px;">Result</div>
+    <pre id="resultPayload"></pre>
+  </div>
+
+  <div id="timeline"></div>
+  <div id="empty">Start or watch an investigation above to see its steps here.</div>
+</main>
+
+<script>
+const NODE_LABELS = {
+  supplier_agent: "Supplier Agent -- resolving identity",
+  supervisor: "Supervisor -- deciding which specialists to run",
+  compliance_agent: "Compliance Agent",
+  risk_agent: "Risk Agent",
+  sustainability_agent: "Sustainability Agent",
+  rag_agent: "RAG Agent",
+  risk_analyst: "Risk Analyst -- merging findings",
+  human_review: "Human Review",
+};
+
+let currentId = null;
+let es = null;
+
+const timelineEl = document.getElementById("timeline");
+const emptyEl = document.getElementById("empty");
+const statusBar = document.getElementById("statusBar");
+const statusBadge = document.getElementById("statusBadge");
+const invIdLabel = document.getElementById("invIdLabel");
+const reviewCard = document.getElementById("reviewCard");
+const resultCard = document.getElementById("resultCard");
+
+function resetView(id) {
+  currentId = id;
+  timelineEl.innerHTML = "";
+  emptyEl.style.display = "none";
+  statusBar.style.display = "flex";
+  invIdLabel.textContent = id;
+  reviewCard.style.display = "none";
+  resultCard.style.display = "none";
+  setStatus("running");
+}
+
+function setStatus(status) {
+  statusBadge.textContent = status;
+  statusBadge.className = "badge " + status;
+}
+
+function addStep(cls, title, meta, bodyObj) {
+  const step = document.createElement("div");
+  step.className = "step" + (cls ? " " + cls : "");
+  const head = document.createElement("div");
+  head.className = "step-head";
+  head.innerHTML = `<span class="step-node">${title}</span><span class="step-meta">${meta}</span>`;
+  const body = document.createElement("div");
+  body.className = "step-body";
+  const pre = document.createElement("pre");
+  pre.textContent = JSON.stringify(bodyObj, null, 2);
+  body.appendChild(pre);
+  head.addEventListener("click", () => body.classList.toggle("open"));
+  step.appendChild(head);
+  step.appendChild(body);
+  timelineEl.appendChild(step);
+  step.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+
+function handleEvent(evt) {
+  if (evt.kind === "node_update") {
+    const label = NODE_LABELS[evt.node] || evt.node;
+    addStep(null, label, "step " + evt.step, evt.update);
+  } else if (evt.kind === "interrupt") {
+    addStep("interrupt", "Paused for human review", "step " + evt.step, evt.request);
+    showReview(evt.request);
+  } else if (evt.kind === "error") {
+    addStep("error", "Error", "", { error: evt.error });
+    setStatus("error");
+  } else if (evt.kind === "status") {
+    setStatus(evt.status);
+    if (evt.status === "awaiting_human_review" && evt.human_review_request) {
+      showReview(evt.human_review_request);
+    }
+    if (evt.status === "completed") {
+      reviewCard.style.display = "none";
+      resultCard.style.display = "block";
+      document.getElementById("resultPayload").textContent = JSON.stringify(
+        { supplier: evt.supplier, risk_assessment: evt.risk_assessment, errors: evt.errors },
+        null,
+        2
+      );
+    }
+  }
+}
+
+function showReview(payload) {
+  reviewCard.style.display = "block";
+  document.getElementById("reviewMessage").textContent = payload.message || "";
+  document.getElementById("reviewPayload").textContent = JSON.stringify(payload, null, 2);
+}
+
+function watch(id) {
+  if (es) es.close();
+  resetView(id);
+  es = new EventSource(`/investigations/${id}/stream`);
+  es.onmessage = (e) => handleEvent(JSON.parse(e.data));
+  es.onerror = () => {
+    // EventSource auto-retries on transient drops; a clean server-side
+    // close (investigation reached a terminal state) also lands here, so
+    // just stop retrying rather than surfacing this as a visible error.
+    es.close();
+  };
+}
+
+document.getElementById("startBtn").addEventListener("click", async () => {
+  const query = document.getElementById("query").value.trim();
+  if (!query) return;
+  const res = await fetch("/investigations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  const data = await res.json();
+  watch(data.investigation_id);
+});
+
+document.getElementById("watchBtn").addEventListener("click", () => {
+  const id = document.getElementById("watchId").value.trim();
+  if (id) watch(id);
+});
+
+document.getElementById("submitReviewBtn").addEventListener("click", async () => {
+  const decision = document.getElementById("decisionSelect").value;
+  const reviewer = document.getElementById("reviewerInput").value.trim();
+  const notes = document.getElementById("notesInput").value.trim();
+  const body = { decision };
+  if (reviewer) body.reviewer = reviewer;
+  if (notes) body.notes = notes;
+  await fetch(`/investigations/${currentId}/review`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  reviewCard.style.display = "none";
+  watch(currentId);
+});
+</script>
+</body>
+</html>

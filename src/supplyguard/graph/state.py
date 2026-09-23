@@ -90,6 +90,7 @@ class InvestigationStateUpdate(TypedDict, total=False):
     compliance_findings: Annotated[list[Finding], operator.add]
     risk_findings: Annotated[list[Finding], operator.add]
     sustainability_findings: Annotated[list[Finding], operator.add]
+    rag_findings: Annotated[list[Finding], operator.add]
 
     conflicts: Annotated[list[str], operator.add]
     missing_information: Annotated[list[str], operator.add]

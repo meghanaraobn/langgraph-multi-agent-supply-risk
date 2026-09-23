@@ -35,6 +35,12 @@ _SYSTEM_PROMPT = (
     "finding; 'low' or 'none' confidence, or a reason describing a clearly "
     "unrelated entity, means this is very likely a coincidental name "
     "collision and must NOT be reported as a sanctions finding.\n\n"
+    "Sanctions exposure is not limited to the supplier company's own name -- "
+    "a senior officer of the supplier (e.g. its primary contact) can be "
+    "individually sanctioned even when the company's own name is clean. "
+    "Always run check_sanctions a second time against the supplier's primary "
+    "contact by name, in addition to the company name, and apply the same "
+    "match_confidence scrutiny to those results.\n\n"
     "Also treat incident severity and status independently: a resolved "
     "incident with verified corrective action is materially different from "
     "an open incident of the same severity -- do not conflate them."
@@ -53,10 +59,13 @@ def risk_agent_node(state: InvestigationState) -> InvestigationStateUpdate:
         return {"errors": ["risk_agent: no supplier in state, cannot proceed"]}
 
     llm_with_tools = get_llm().bind_tools(RISK_TOOLS).with_retry()
+    contact = supplier.primary_contact
     request = (
         f"Investigate risk for supplier {supplier.id} ({supplier.name}). "
         "Check its reported incidents and screen its name against sanctions "
-        "watchlists, then report your risk findings."
+        f"watchlists. Its primary contact is {contact.name} ({contact.title}) -- "
+        "screen that name against sanctions watchlists too, separately from "
+        "the company name. Then report your risk findings."
     )
     messages: list[BaseMessage] = [SystemMessage(_SYSTEM_PROMPT), HumanMessage(request)]
 

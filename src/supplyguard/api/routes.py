@@ -18,11 +18,16 @@ completed, and never-invoked thread_id before writing this logic.
 """
 from __future__ import annotations
 
+import asyncio
+import json
 import logging
+import queue
 import uuid
 from functools import lru_cache
+from pathlib import Path
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi.responses import HTMLResponse, StreamingResponse
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command
 from langgraph.types import StateSnapshot
@@ -33,11 +38,14 @@ from supplyguard.api.schemas import (
     InvestigationRequest,
     InvestigationStatusResponse,
 )
+from supplyguard.api.streaming import bus, json_safe
 from supplyguard.graph import build_investigation_graph, create_initial_state
 
 logger = logging.getLogger("supplyguard.api")
 
 router = APIRouter(tags=["investigations"])
+
+_VIEWER_HTML = (Path(__file__).parent / "static" / "viewer.html").read_text()
 
 
 @lru_cache(maxsize=1)
@@ -65,18 +73,83 @@ def _get_snapshot_or_503(investigation_id: str) -> StateSnapshot:
         ) from exc
 
 
+def _stream_and_publish(investigation_id: str, graph_input) -> None:
+    """Runs the graph via .stream(..., stream_mode="updates") instead of
+    .invoke() so each node's completion (and any interrupt) is published to
+    the event bus as it happens -- .invoke() only returns once the whole run
+    reaches an interrupt or END, which is too coarse for a live trace. The
+    persisted checkpoint state ends up identical either way; this only adds
+    a side-channel of "here's what just happened" events for any SSE
+    subscriber watching this investigation_id.
+    """
+    step = 0
+    try:
+        for chunk in _get_graph().stream(
+            graph_input, config=_config(investigation_id), stream_mode="updates"
+        ):
+            step += 1
+            if "__interrupt__" in chunk:
+                interrupt_obj = chunk["__interrupt__"][0]
+                bus.publish(
+                    investigation_id,
+                    {"kind": "interrupt", "step": step, "request": json_safe(interrupt_obj.value)},
+                )
+                continue
+            for node, update in chunk.items():
+                bus.publish(
+                    investigation_id,
+                    {"kind": "node_update", "step": step, "node": node, "update": json_safe(update)},
+                )
+    except Exception as exc:  # noqa: BLE001 -- also report to any live watcher before the outer caller logs it
+        bus.publish(investigation_id, {"kind": "error", "error": f"{type(exc).__name__}: {exc}"})
+        raise
+    finally:
+        bus.publish(investigation_id, {"kind": "end"})
+
+
 def _run_investigation(investigation_id: str, query: str) -> None:
     try:
-        _get_graph().invoke(create_initial_state(investigation_id, query), config=_config(investigation_id))
+        _stream_and_publish(investigation_id, create_initial_state(investigation_id, query))
     except Exception:  # noqa: BLE001 -- background task: nothing re-raises this to a client, so at least log it
         logger.exception("Investigation %s failed outside the per-node safety net", investigation_id)
 
 
 def _run_resume(investigation_id: str, payload: dict) -> None:
     try:
-        _get_graph().invoke(Command(resume=payload), config=_config(investigation_id))
+        _stream_and_publish(investigation_id, Command(resume=payload))
     except Exception:  # noqa: BLE001 -- same rationale as _run_investigation
         logger.exception("Resuming investigation %s failed", investigation_id)
+
+
+def _sse(event: dict) -> str:
+    return f"data: {json.dumps(event)}\n\n"
+
+
+def _status_response(investigation_id: str, snapshot: StateSnapshot) -> InvestigationStatusResponse:
+    values = snapshot.values
+    supplier = values.get("supplier")
+    risk_assessment = values.get("risk_assessment")
+    human_decision = values.get("human_decision")
+
+    if snapshot.interrupts:
+        status = "awaiting_human_review"
+        human_review_request = snapshot.interrupts[0].value
+    elif snapshot.next:
+        status = "running"
+        human_review_request = None
+    else:
+        status = "completed"
+        human_review_request = None
+
+    return InvestigationStatusResponse(
+        investigation_id=investigation_id,
+        status=status,
+        supplier=supplier.model_dump(mode="json") if supplier else None,
+        risk_assessment=risk_assessment.model_dump(mode="json") if risk_assessment else None,
+        human_review_request=human_review_request,
+        human_decision=human_decision.model_dump(mode="json") if human_decision else None,
+        errors=values.get("errors", []),
+    )
 
 
 @router.post(
@@ -114,30 +187,72 @@ def get_investigation(investigation_id: str) -> InvestigationStatusResponse:
     if not snapshot.values:
         raise HTTPException(status_code=404, detail=f"No investigation found with id '{investigation_id}'")
 
-    values = snapshot.values
-    supplier = values.get("supplier")
-    risk_assessment = values.get("risk_assessment")
-    human_decision = values.get("human_decision")
+    return _status_response(investigation_id, snapshot)
 
-    if snapshot.interrupts:
-        status = "awaiting_human_review"
-        human_review_request = snapshot.interrupts[0].value
-    elif snapshot.next:
-        status = "running"
-        human_review_request = None
-    else:
-        status = "completed"
-        human_review_request = None
 
-    return InvestigationStatusResponse(
-        investigation_id=investigation_id,
-        status=status,
-        supplier=supplier.model_dump(mode="json") if supplier else None,
-        risk_assessment=risk_assessment.model_dump(mode="json") if risk_assessment else None,
-        human_review_request=human_review_request,
-        human_decision=human_decision.model_dump(mode="json") if human_decision else None,
-        errors=values.get("errors", []),
+@router.get(
+    "/investigations/{investigation_id}/stream",
+    summary="Watch an investigation's agent steps live (SSE)",
+    description=(
+        "Server-Sent Events stream of the graph's node-by-node progress -- supplier_agent, "
+        "supervisor, each specialist that was scheduled, risk_analyst, human_review -- as they "
+        "happen, instead of repeatedly calling GET /investigations/{investigation_id} yourself. "
+        "Sends one 'status' event immediately with the current state, then live 'node_update' / "
+        "'interrupt' events until the investigation reaches 'completed' or "
+        "'awaiting_human_review', at which point a final 'status' event is sent and the stream "
+        "closes. Open /viewer in a browser for a rendered version of this stream."
+    ),
+)
+async def stream_investigation(investigation_id: str, request: Request) -> StreamingResponse:
+    # Subscribed before the first status check, deliberately -- an event
+    # published between "check current snapshot" and "start listening"
+    # would otherwise be silently missed. Any event that arrives before the
+    # loop starts just sits in the queue until the loop reaches it.
+    q = bus.subscribe(investigation_id)
+
+    async def event_source():
+        try:
+            snapshot = await asyncio.to_thread(_get_snapshot_or_503, investigation_id)
+            if not snapshot.values:
+                yield _sse(
+                    {"kind": "error", "error": f"No investigation found with id '{investigation_id}'"}
+                )
+                return
+
+            status = _status_response(investigation_id, snapshot)
+            yield _sse({"kind": "status", **status.model_dump(mode="json")})
+            if status.status != "running":
+                return
+
+            while True:
+                if await request.is_disconnected():
+                    return
+                try:
+                    event = await asyncio.to_thread(q.get, True, 15)
+                except queue.Empty:
+                    yield ": keepalive\n\n"
+                    continue
+                if event["kind"] == "end":
+                    break
+                yield _sse(event)
+
+            final_snapshot = await asyncio.to_thread(_get_snapshot_or_503, investigation_id)
+            if final_snapshot.values:
+                final = _status_response(investigation_id, final_snapshot)
+                yield _sse({"kind": "status", **final.model_dump(mode="json")})
+        finally:
+            bus.unsubscribe(investigation_id, q)
+
+    return StreamingResponse(
+        event_source(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@router.get("/viewer", response_class=HTMLResponse, include_in_schema=False)
+def viewer() -> HTMLResponse:
+    return HTMLResponse(_VIEWER_HTML)
 
 
 @router.post(
