@@ -84,7 +84,7 @@ flowchart LR
 flowchart LR
     GEN["generate_synthetic_pdfs.py<br/>(reportlab)"] --> PDF[/Raw audit-report PDFs/]
     PDF --> PARSE["pdfplumber<br/>layout/table-aware parsing"]
-    PARSE --> CHUNK["RecursiveCharacterTextSplitter<br/>(langchain-text-splitters)"]
+    PARSE --> CHUNK["NLTKTextSplitter, sentence-boundary<br/>(RecursiveCharacterTextSplitter fallback<br/>for oversized pieces, e.g. tables)"]
     CHUNK --> EMBED["sentence-transformers<br/>BAAI/bge-large-en-v1.5"]
     EMBED --> WV[("Weaviate")]
 ```
@@ -109,8 +109,6 @@ design decisions behind it.
   seed script that loads one into the other
 - `src/supplyguard/models/` — Pydantic domain models: supplier, compliance, risk, sustainability,
   findings, investigation
-- `src/supplyguard/observability/` — a custom callback handler logging per-node latency, retries,
-  and token usage, alongside LangSmith tracing
 - `src/supplyguard/evaluation/` — evaluation dataset, evaluator, and metrics
 - `data/` — sample/fixture data used by tools and evaluation, including `data/documents/` (the
   synthetic supplier audit report PDFs ingested by the RAG pipeline)
