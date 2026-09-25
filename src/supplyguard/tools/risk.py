@@ -9,9 +9,11 @@ from typing import Any
 from langchain_core.tools import tool
 
 from supplyguard.data import get_repository
+from supplyguard.tools.registry import register_tool
 from supplyguard.tools.resilience import safe_tool
 
 
+@register_tool("risk")
 @tool
 @safe_tool
 def search_incidents(supplier_id: str) -> list[dict[str, Any]]:
@@ -32,6 +34,7 @@ def search_incidents(supplier_id: str) -> list[dict[str, Any]]:
     return [i.model_dump(mode="json") for i in incidents]
 
 
+@register_tool("risk")
 @tool
 @safe_tool
 def check_sanctions(supplier_name: str) -> list[dict[str, Any]]:

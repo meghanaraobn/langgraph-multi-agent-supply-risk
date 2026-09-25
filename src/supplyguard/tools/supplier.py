@@ -10,9 +10,11 @@ from typing import Any
 from langchain_core.tools import tool
 
 from supplyguard.data import SupplierNotFoundError, get_repository
+from supplyguard.tools.registry import register_tool
 from supplyguard.tools.resilience import safe_tool
 
 
+@register_tool("supplier")
 @tool
 @safe_tool
 def search_supplier(query: str) -> list[dict[str, Any]]:
@@ -32,6 +34,7 @@ def search_supplier(query: str) -> list[dict[str, Any]]:
     return [s.model_dump(mode="json") for s in matches]
 
 
+@register_tool("supplier")
 @tool
 @safe_tool
 def get_supplier_by_id(supplier_id: str) -> dict[str, Any]:

@@ -9,9 +9,11 @@ from typing import Any
 from langchain_core.tools import tool
 
 from supplyguard.rag.vector_store import search
+from supplyguard.tools.registry import register_tool
 from supplyguard.tools.resilience import safe_tool
 
 
+@register_tool("rag")
 @tool
 @safe_tool
 def search_documents(supplier_id: str, query: str, top_k: int = 5) -> list[dict[str, Any]]:

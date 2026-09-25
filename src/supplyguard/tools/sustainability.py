@@ -8,9 +8,11 @@ from typing import Any
 from langchain_core.tools import tool
 
 from supplyguard.data import get_repository
+from supplyguard.tools.registry import register_tool
 from supplyguard.tools.resilience import safe_tool
 
 
+@register_tool("sustainability")
 @tool
 @safe_tool
 def get_sustainability_information(supplier_id: str) -> dict[str, Any]:

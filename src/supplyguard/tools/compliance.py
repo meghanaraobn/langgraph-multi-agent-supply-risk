@@ -8,9 +8,11 @@ from typing import Any
 from langchain_core.tools import tool
 
 from supplyguard.data import get_repository
+from supplyguard.tools.registry import register_tool
 from supplyguard.tools.resilience import safe_tool
 
 
+@register_tool("compliance")
 @tool
 @safe_tool
 def get_certifications(supplier_id: str) -> list[dict[str, Any]]:
@@ -29,6 +31,7 @@ def get_certifications(supplier_id: str) -> list[dict[str, Any]]:
     return [c.model_dump(mode="json") for c in certs]
 
 
+@register_tool("compliance")
 @tool
 @safe_tool
 def get_regulatory_requirements(industry: str) -> list[dict[str, Any]]:
