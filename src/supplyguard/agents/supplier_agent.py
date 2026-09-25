@@ -24,6 +24,7 @@ from supplyguard.models import Supplier
 from supplyguard.tools import SUPPLIER_TOOLS
 
 _TOOLS_BY_NAME = {t.name: t for t in SUPPLIER_TOOLS}
+_MAX_TOOL_ITERATIONS = 10
 
 _SYSTEM_PROMPT = (
     "You are the Supplier Identification Agent for a supply chain risk "
@@ -48,7 +49,7 @@ def run_supplier_agent(request: str) -> SupplierIdentificationResult:
     llm_with_tools = get_llm().bind_tools(SUPPLIER_TOOLS).with_retry()
     messages: list[BaseMessage] = [SystemMessage(_SYSTEM_PROMPT), HumanMessage(request)]
 
-    while True:
+    for _ in range(_MAX_TOOL_ITERATIONS):
         ai_message = llm_with_tools.invoke(messages)
         messages.append(ai_message)
 
@@ -59,6 +60,11 @@ def run_supplier_agent(request: str) -> SupplierIdentificationResult:
             tool = _TOOLS_BY_NAME[call["name"]]
             result = tool.invoke(call["args"])
             messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
+    else:
+        raise RuntimeError(
+            f"supplier_agent: exceeded {_MAX_TOOL_ITERATIONS} tool-calling iterations "
+            "without a final answer"
+        )
 
     structured_llm = get_llm().with_structured_output(SupplierIdentificationResult).with_retry()
     return structured_llm.invoke(

@@ -19,6 +19,7 @@ from supplyguard.models import Finding
 from supplyguard.tools import COMPLIANCE_TOOLS
 
 _TOOLS_BY_NAME = {t.name: t for t in COMPLIANCE_TOOLS}
+_MAX_TOOL_ITERATIONS = 10
 
 _SYSTEM_PROMPT = (
     "You are the Compliance Agent for a supply chain risk investigation "
@@ -48,11 +49,15 @@ def compliance_agent_node(state: InvestigationState) -> InvestigationStateUpdate
     request = (
         f"Investigate compliance for supplier {supplier.id} ({supplier.name}), "
         f"industry: {supplier.industry}. Check its certifications and the "
-        "regulations applicable to its industry, and report your findings."
+        "regulations applicable to its industry, and report your findings.\n\n"
+        f'The user\'s original request was: "{state["user_request"]}". Use it '
+        "to decide which of your tools are actually relevant and to focus your "
+        "findings on what was asked -- but don't report a clean bill of health "
+        "on a dimension you skipped just because the request didn't mention it."
     )
     messages: list[BaseMessage] = [SystemMessage(_SYSTEM_PROMPT), HumanMessage(request)]
 
-    while True:
+    for _ in range(_MAX_TOOL_ITERATIONS):
         ai_message = llm_with_tools.invoke(messages)
         messages.append(ai_message)
 
@@ -63,6 +68,11 @@ def compliance_agent_node(state: InvestigationState) -> InvestigationStateUpdate
             tool = _TOOLS_BY_NAME[call["name"]]
             result = tool.invoke(call["args"])
             messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
+    else:
+        raise RuntimeError(
+            f"compliance_agent: exceeded {_MAX_TOOL_ITERATIONS} tool-calling iterations "
+            "without a final answer"
+        )
 
     structured_llm = get_llm().with_structured_output(ComplianceAgentOutput).with_retry()
     output = structured_llm.invoke(
